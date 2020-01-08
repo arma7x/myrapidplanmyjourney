@@ -34,6 +34,7 @@ class _MyHomePageState extends State<MyHomePage> {
       child: new Scaffold(
         appBar: AppBar(
           title: Text(widget.title),
+          elevation: 0.0,
         ),
         body: TabBarView(
           children: [
