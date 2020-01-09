@@ -26,7 +26,7 @@ class _ServiceStatusState extends State<ServiceStatus> with AutomaticKeepAliveCl
 
   Future<Null> _getListServiceStatus() async {
     try {
-      final response = await await Api.ListServiceStatus();
+      final response = await Api.ListServiceStatus();
       if (response.statusCode == 200) {
         final responseBody = json.decode(response.body);
         setState(() {
@@ -45,7 +45,7 @@ class _ServiceStatusState extends State<ServiceStatus> with AutomaticKeepAliveCl
   Future<Null> _getListServiceMsg() async {
     try {
       Map<String, dynamic> tempListServiceMsg = {};
-      final response = await await Api.ListServiceMsg();
+      final response = await Api.ListServiceMsg();
       if (response.statusCode == 200) {
         final responseBody = json.decode(response.body);
         responseBody['data'][0].forEach((k, v) {
