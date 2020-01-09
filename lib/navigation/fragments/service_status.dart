@@ -71,7 +71,7 @@ class _ServiceStatusState extends State<ServiceStatus> with AutomaticKeepAliveCl
         var item = new Column(
           children: <Widget>[
             new ServiceStatusList.fromJson(current),
-            new Divider(height: 5.0)
+            new SizedBox(height: 10.0)
           ],
         );
         items.add(item);
@@ -79,14 +79,14 @@ class _ServiceStatusState extends State<ServiceStatus> with AutomaticKeepAliveCl
     } else {
       for (var i=0; i<5; i++) {
         items.add(new Card(
-          margin: EdgeInsets.fromLTRB(5, 0, 5, 0),
+          margin: EdgeInsets.fromLTRB(10.0, 0, 10.0, 0),
           color: serviceStatusLoading ? Colors.white : Colors.grey[50],
           child: SizedBox(
-            width: (MediaQuery.of(context).size.width - 10),
-            height: (MediaQuery.of(context).size.width - 10) * 0.20,
+            width: (MediaQuery.of(context).size.width - 20),
+            height: (MediaQuery.of(context).size.width - 20) * 0.20,
           )
         ));
-        items.add(new Divider(height: 5.0));
+        items.add(new SizedBox(height: 10.0));
       }
     }
     return items;
@@ -94,11 +94,11 @@ class _ServiceStatusState extends State<ServiceStatus> with AutomaticKeepAliveCl
 
   Widget _renderServiceMsg() {
     return new Card(
-      margin: EdgeInsets.fromLTRB(5, 0, 5, 0),
+      margin: EdgeInsets.fromLTRB(10.0, 0, 10.0, 0),
       color: serviceStatusLoading ? Theme.of(context).primaryColor : Colors.grey[50],
       child: serviceStatusLoading ? new Container(
         padding: EdgeInsets.all(10),
-        width: (MediaQuery.of(context).size.width - 10),
+        width: (MediaQuery.of(context).size.width - 20),
         child: new Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -118,8 +118,8 @@ class _ServiceStatusState extends State<ServiceStatus> with AutomaticKeepAliveCl
           ]
         )
       ) : SizedBox(
-        width: (MediaQuery.of(context).size.width - 10),
-        height: (MediaQuery.of(context).size.width - 10) * 0.17,
+        width: (MediaQuery.of(context).size.width - 20),
+        height: (MediaQuery.of(context).size.width - 20) * 0.17,
       )
     );
   }
@@ -132,9 +132,9 @@ class _ServiceStatusState extends State<ServiceStatus> with AutomaticKeepAliveCl
         child: new Container(
           child: new Column(
             children: <Widget>[
-              new Divider(height: 5.0),
+              new SizedBox(height: 10.0),
               _renderServiceMsg(),
-              new Divider(height: 5.0),
+              new SizedBox(height: 10.0),
               new Expanded(
                 child: new ListView(
                   children: _renderServiceStatus(),

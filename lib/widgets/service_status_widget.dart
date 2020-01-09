@@ -40,28 +40,28 @@ class ServiceStatusList extends StatelessWidget {
   Widget build(BuildContext context) {
 
     return new Card(
-      margin: EdgeInsets.fromLTRB(5, 0, 5, 0),
+      margin: EdgeInsets.fromLTRB(10.0, 0, 10.0, 0),
       color: this.setting_cssclass == 'green' ? Colors.green : Colors.orange,
       child: new Row(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           new Container(
-            width: (MediaQuery.of(context).size.width - 10) * 0.20,
-            height: (MediaQuery.of(context).size.width - 10) * 0.20,
+            width: (MediaQuery.of(context).size.width - 20) * 0.20,
+            height: (MediaQuery.of(context).size.width - 20) * 0.20,
             child: new ClipRect(
               child: new OverflowBox(
                 maxWidth: double.infinity,
                 maxHeight: double.infinity,
-                minWidth: (MediaQuery.of(context).size.width - 10) * 0.20,
-                minHeight: (MediaQuery.of(context).size.width - 10) * 0.20,
+                minWidth: (MediaQuery.of(context).size.width - 20) * 0.20,
+                minHeight: (MediaQuery.of(context).size.width - 20) * 0.20,
                 alignment: Alignment.center,
                 child: new FittedBox(
                   fit: BoxFit.none,
                   alignment: Alignment.center,
                   child: new Image(
-                    width: (MediaQuery.of(context).size.width) * 0.21,
-                    height: (MediaQuery.of(context).size.width) * 0.21,
+                    width: (MediaQuery.of(context).size.width) * 0.20,
+                    height: (MediaQuery.of(context).size.width) * 0.20,
                     fit: BoxFit.fill,
                     image: NetworkImage(this.service_logo),
                   )
@@ -70,8 +70,8 @@ class ServiceStatusList extends StatelessWidget {
             )
           ),
           new Container(
-            width: (MediaQuery.of(context).size.width - 10) * 0.80,
-            height: (MediaQuery.of(context).size.width - 10) * 0.20,
+            width: (MediaQuery.of(context).size.width - 20) * 0.80,
+            height: (MediaQuery.of(context).size.width - 20) * 0.20,
             padding: EdgeInsets.all(10),
             child: new Column(
               mainAxisAlignment: MainAxisAlignment.start,

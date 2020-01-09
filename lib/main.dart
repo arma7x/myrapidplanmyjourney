@@ -45,8 +45,8 @@ class _MyHomePageState extends State<MyHomePage> {
         bottomNavigationBar: new TabBar(
           tabs: [
             Tab(
-              icon: new Icon(Icons.transfer_within_a_station),
-              text: 'Trip',
+              icon: new Icon(Icons.directions),
+              text: 'Direction',
             ),
             Tab(
               icon: new Icon(Icons.traffic),
