@@ -11,8 +11,8 @@ class ServiceStatus extends StatefulWidget {
 
 class _ServiceStatusState extends State<ServiceStatus> with AutomaticKeepAliveClientMixin<ServiceStatus> {
 
-  bool serviceStatusLoading = false;
-  bool serviceMsgLoading = false;
+  bool serviceStatusLoading = true;
+  bool serviceMsgLoading = true;
   List<dynamic> listServiceStatus = [];
   Map<String, dynamic> listServiceMsg = {};
 
@@ -31,7 +31,7 @@ class _ServiceStatusState extends State<ServiceStatus> with AutomaticKeepAliveCl
         final responseBody = json.decode(response.body);
         setState(() {
           listServiceStatus = responseBody['data'];
-          serviceStatusLoading = true;
+          serviceStatusLoading = false;
         });
       } else {
         //Fluttertoast.showToast(msg: "Network Error", toastLength: Toast.LENGTH_SHORT);
@@ -53,7 +53,7 @@ class _ServiceStatusState extends State<ServiceStatus> with AutomaticKeepAliveCl
         });
         setState(() {
           listServiceMsg = tempListServiceMsg;
-          serviceMsgLoading = true;
+          serviceMsgLoading = false;
         });
       } else {
         //Fluttertoast.showToast(msg: "Network Error", toastLength: Toast.LENGTH_SHORT);
@@ -67,16 +67,6 @@ class _ServiceStatusState extends State<ServiceStatus> with AutomaticKeepAliveCl
   List<Widget> _renderServiceStatus() {
     List<Widget> items = [];
     if (serviceStatusLoading) {
-      for (var current in listServiceStatus) {
-        var item = new Column(
-          children: <Widget>[
-            new ServiceStatusList.fromJson(current),
-            new SizedBox(height: 10.0)
-          ],
-        );
-        items.add(item);
-      }
-    } else {
       for (var i=0; i<5; i++) {
         items.add(new Card(
           margin: EdgeInsets.fromLTRB(10.0, 0, 10.0, 0),
@@ -88,17 +78,33 @@ class _ServiceStatusState extends State<ServiceStatus> with AutomaticKeepAliveCl
         ));
         items.add(new SizedBox(height: 10.0));
       }
+    } else {
+      for (var current in listServiceStatus) {
+        var item = new Column(
+          children: <Widget>[
+            new ServiceStatusList.fromJson(current),
+            new SizedBox(height: 10.0)
+          ],
+        );
+        items.add(item);
+      }
     }
     return items;
   }
 
   Widget _renderServiceMsg() {
-    return new Card(
-      margin: EdgeInsets.fromLTRB(10.0, 0, 10.0, 0),
-      color: serviceStatusLoading ? Theme.of(context).primaryColor : Colors.grey[50],
-      child: serviceStatusLoading ? new Container(
+    if (serviceStatusLoading) {
+      return new Container(
+        color: Colors.grey[50],
+        width: (MediaQuery.of(context).size.width),
+        height: (MediaQuery.of(context).size.width - 20) * 0.17,
+        child: new Text(''),
+      );
+    } else {
+      return new Container(
+        color: Theme.of(context).primaryColor,
         padding: EdgeInsets.all(10),
-        width: (MediaQuery.of(context).size.width - 20),
+        width: (MediaQuery.of(context).size.width),
         child: new Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -117,11 +123,8 @@ class _ServiceStatusState extends State<ServiceStatus> with AutomaticKeepAliveCl
             ),
           ]
         )
-      ) : SizedBox(
-        width: (MediaQuery.of(context).size.width - 20),
-        height: (MediaQuery.of(context).size.width - 20) * 0.17,
-      )
-    );
+      );
+    }
   }
 
   @override
@@ -132,7 +135,6 @@ class _ServiceStatusState extends State<ServiceStatus> with AutomaticKeepAliveCl
         child: new Container(
           child: new Column(
             children: <Widget>[
-              new SizedBox(height: 10.0),
               _renderServiceMsg(),
               new SizedBox(height: 10.0),
               new Expanded(
@@ -145,8 +147,8 @@ class _ServiceStatusState extends State<ServiceStatus> with AutomaticKeepAliveCl
         ),
         onRefresh: () async {
           setState(() {
-            serviceStatusLoading = false;
-            serviceMsgLoading = false;
+            serviceStatusLoading = true;
+            serviceMsgLoading = true;
           });
           await _getListServiceStatus();
           await _getListServiceMsg();

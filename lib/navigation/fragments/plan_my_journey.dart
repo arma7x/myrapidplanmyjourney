@@ -3,18 +3,20 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:myrapidplanmyjourney/api.dart';
+import 'package:myrapidplanmyjourney/navigation/fragments.dart' show FragmentUtils;
 
 class PlanMyJourney extends StatefulWidget {
   @override
   _PlanMyJourneyState createState() => new _PlanMyJourneyState();
 }
 
-class _PlanMyJourneyState extends State<PlanMyJourney> with AutomaticKeepAliveClientMixin<PlanMyJourney> {
+class _PlanMyJourneyState extends State<PlanMyJourney> with FragmentUtils, AutomaticKeepAliveClientMixin<PlanMyJourney> {
 
   Map<String, String> from = {};
   final TextEditingController _fromController = TextEditingController();
   Map<String, String> to = {};
   final TextEditingController _toController = TextEditingController();
+  TimeOfDay selectedTime = TimeOfDay.now();
   String time = TimeOfDay.now().toString().replaceAll('TimeOfDay(', '').replaceAll(')', '');
   String mode = '';
   String type = '';
@@ -41,10 +43,35 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with AutomaticKeepAliveCl
     return <dynamic>[];
   }
 
+  void _getListPlanner() async {
+    try {
+      Map<String, String> query = {
+        'flat': from['lat'] != null ? from['lat'] : '',
+        'flng': from['lng'] != null ? from['lng'] : '',
+        'tlat': to['lat'] != null ? to['lat'] : '',
+        'tlng': to['lng'] != null ? to['lng'] : '',
+        'time': time + ':00',
+        'mode': mode,
+        'type': type,
+      };
+      showloadingDialog(true, context);
+      final response = await Api.ListPlanner(query);
+      showloadingDialog(false, context);
+      if (response.statusCode == 200) {
+        final responseBody = json.decode(response.body);
+        print(responseBody['data']);
+      } else {
+        //Fluttertoast.showToast(msg: "Network Error", toastLength: Toast.LENGTH_SHORT);
+      }
+    } on Exception {
+      //Fluttertoast.showToast(msg: "Network Error", toastLength: Toast.LENGTH_SHORT);
+    }
+  }
+
   Future<Null> _selectTime(BuildContext context) async {
     final TimeOfDay picked = await showTimePicker(
       context: context,
-      initialTime: TimeOfDay.now(),
+      initialTime: selectedTime,
       builder: (BuildContext context, Widget child) {
         return MediaQuery(
           data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
@@ -54,6 +81,7 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with AutomaticKeepAliveCl
     );
     if (picked != null) {
       setState(() {
+        selectedTime = picked;
         time = picked.toString().replaceAll('TimeOfDay(', '').replaceAll(')', '');
       });
     }
@@ -71,36 +99,51 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with AutomaticKeepAliveCl
     // TODO: implement build
     return new Container(
       color: Colors.white,
-      child: new Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: new ListView(
         children: <Widget>[
           new SizedBox(height: 10.0),
-          Container(
+          new Container(
+            decoration: new BoxDecoration(
+              color: Colors.red,
+              borderRadius: new BorderRadius.only(
+                topLeft: const Radius.circular(3.0),
+                topRight: const Radius.circular(3.0),
+                bottomLeft: const Radius.circular(3.0),
+                bottomRight: const Radius.circular(3.0),
+              )
+            ),
             margin: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 0.0),
+            padding: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 10.0),
             child: new Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
                 new Text(
-                  "FROM",
+                  "CURRENT LOCATION",
                   style: Theme.of(context).textTheme.body2.merge(TextStyle(
-                    color: Colors.black,
+                    color: Colors.white,
                     fontSize: 16.0,
                     fontWeight: FontWeight.w500,
                     )
                   )
                 ),
+                new SizedBox(height: 5.0),
                 TypeAheadField(
                   textFieldConfiguration: TextFieldConfiguration(
                     autofocus: false,
                     controller: _fromController,
-                    style: DefaultTextStyle.of(context)
-                        .style
-                        .copyWith(fontStyle: FontStyle.italic),
+                    style: DefaultTextStyle.of(context).style.copyWith(color: Colors.black, fontStyle: FontStyle.italic, fontSize: 16.0),
                     decoration: InputDecoration(
-                        border: OutlineInputBorder(),
-                        hintText: 'search a road name or landmark'),
+                      prefixIcon: Icon(
+                        Icons.location_searching,
+                        size: 24.0,
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: InputBorder.none,
+                      hintText: 'search a road name or landmark',
+                      hintStyle: DefaultTextStyle.of(context).style.copyWith(color: Colors.grey, fontStyle: FontStyle.italic, fontSize: 16.0)
+                    ),
                   ),
                   suggestionsCallback: (pattern) async {
                     return await _getListStreetAutocomplete(pattern);
@@ -125,36 +168,34 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with AutomaticKeepAliveCl
                     setState(() { from = tempFrom; });
                     _fromController.text = from['label'];
                   },
-                )
-              ]
-            )
-          ),
-          new SizedBox(height: 10.0),
-          Container(
-            margin: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 0.0),
-            child: new Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
+                ),
+                new SizedBox(height: 10.0),
                 new Text(
-                  "TO",
+                  "DESTINATION",
                   style: Theme.of(context).textTheme.body2.merge(TextStyle(
-                    color: Colors.black,
+                    color: Colors.white,
                     fontSize: 16.0,
                     fontWeight: FontWeight.w500,
                     )
                   )
                 ),
+                new SizedBox(height: 5.0),
                 TypeAheadField(
                   textFieldConfiguration: TextFieldConfiguration(
                     autofocus: false,
                     controller: _toController,
-                    style: DefaultTextStyle.of(context)
-                        .style
-                        .copyWith(fontStyle: FontStyle.italic),
+                    style: DefaultTextStyle.of(context).style.copyWith(color: Colors.black, fontStyle: FontStyle.italic, fontSize: 16.0),
                     decoration: InputDecoration(
-                        border: OutlineInputBorder(),
-                        hintText: 'search a road name or landmark'),
+                      prefixIcon: Icon(
+                        Icons.flag,
+                        size: 24.0,
+                      ),
+                      filled: true,
+                      fillColor: Colors.white,
+                      border: InputBorder.none,
+                      hintText: 'search a road name or landmark',
+                      hintStyle: DefaultTextStyle.of(context).style.copyWith(color: Colors.grey, fontStyle: FontStyle.italic, fontSize: 16.0)
+                    ),
                   ),
                   suggestionsCallback: (pattern) async {
                     return await _getListStreetAutocomplete(pattern);
@@ -184,190 +225,256 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with AutomaticKeepAliveCl
             )
           ),
           new SizedBox(height: 10.0),
-          Container(
+          new Container(
+            decoration: new BoxDecoration(
+              color: Theme.of(context).primaryColor,
+              borderRadius: new BorderRadius.only(
+                topLeft: const Radius.circular(3.0),
+                topRight: const Radius.circular(3.0),
+                bottomLeft: const Radius.circular(3.0),
+                bottomRight: const Radius.circular(3.0),
+              )
+            ),
             margin: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 0.0),
-            child: new Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                new Text(
-                  'OPTIONS',
-                  style: Theme.of(context).textTheme.body2.merge(TextStyle(
-                    color: Colors.black,
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.w500,
-                    )
-                  )
-                ),
-                new Row(
-                  children: <Widget>[
-                    new Row(
-                      children: <Widget>[
-                        Radio(
-                          autofocus: true,
-                          focusColor: Theme.of(context).primaryColor,
-                          groupValue: type,
-                          value: '',
-                          onChanged: (String value) {
-                            setState(() { type = ''; });
-                          },
-                        ),
-                        new Row(
-                          children: <Widget>[
-                            new Icon(Icons.access_time),
-                            const Text('Shortest Time')
-                          ]
+            padding: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 5.0),
+            child: Theme(
+              data: ThemeData.dark(), //set the dark theme or write your own theme
+              child:  new Column(
+                children: <Widget>[
+                  new Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      new Text(
+                        'OPTIONS',
+                        style: Theme.of(context).textTheme.body2.merge(TextStyle(
+                          color: Colors.white,
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.w500,
+                          )
                         )
-                      ]
-                    ),
-                    new Row(
-                      children: <Widget>[
-                        Radio(
-                          value: 'leasttransit',
-                          focusColor: Theme.of(context).primaryColor,
-                          groupValue: type,
-                          onChanged: (String value) {
-                            setState(() { type = 'leasttransit'; });
-                          },
-                        ),
-                        new Row(
-                          children: <Widget>[
-                            new Icon(Icons.store_mall_directory),
-                            const Text('Least Transfer')
-                          ]
+                      ),
+                      new Column(
+                        children: <Widget>[
+                          new Row(
+                            children: <Widget>[
+                              Radio(
+                                autofocus: true,
+                                activeColor: Colors.white,
+                                groupValue: type,
+                                value: '',
+                                onChanged: (String value) {
+                                  setState(() { type = ''; });
+                                },
+                              ),
+                              new Row(
+                                children: <Widget>[
+                                  new Icon(
+                                    Icons.timer,
+                                    color: Colors.white,
+                                  ),
+                                  new Text(
+                                    'Shortest Time',
+                                    style: Theme.of(context).textTheme.body2.merge(TextStyle(color: Colors.white,))
+                                  )
+                                ]
+                              )
+                            ]
+                          ),
+                          new Row(
+                            children: <Widget>[
+                              Radio(
+                                value: 'leasttransit',
+                                activeColor: Colors.white,
+                                groupValue: type,
+                                onChanged: (String value) {
+                                  setState(() { type = 'leasttransit'; });
+                                },
+                              ),
+                              new Row(
+                                children: <Widget>[
+                                  new Icon(
+                                    Icons.store_mall_directory,
+                                    color: Colors.white,
+                                  ),
+                                  new Text(
+                                    'Least Transfer',
+                                    style: Theme.of(context).textTheme.body2.merge(TextStyle(color: Colors.white,))
+                                  )
+                                ]
+                              )
+                            ]
+                          ),
+                        ],
+                      )
+                    ]
+                  ),
+                  new Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: <Widget>[
+                      new Text(
+                        'MODES',
+                        style: Theme.of(context).textTheme.body2.merge(TextStyle(
+                          color: Colors.white,
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.w500,
+                          )
                         )
-                      ]
-                    ),
-                  ],
-                )
-              ]
-            )
+                      ),
+                      new Column(
+                        children: <Widget>[
+                          new Row(
+                            children: <Widget>[
+                              Radio(
+                                autofocus: true,
+                                activeColor: Colors.white,
+                                groupValue: mode,
+                                value: '',
+                                onChanged: (String value) {
+                                  setState(() { mode = ''; });
+                                },
+                              ),
+                              new Row(
+                                children: <Widget>[
+                                  new Icon(
+                                    Icons.rv_hookup,
+                                    color: Colors.white,
+                                  ),
+                                  new Text(
+                                    'Mixed',
+                                    style: Theme.of(context).textTheme.body2.merge(TextStyle(color: Colors.white,))
+                                  )
+                                ]
+                              )
+                            ]
+                          ),
+                          new Row(
+                            children: <Widget>[
+                              Radio(
+                                value: 'bus',
+                                activeColor: Colors.white,
+                                groupValue: mode,
+                                onChanged: (String value) {
+                                  setState(() { mode = 'bus'; });
+                                },
+                              ),
+                              new Row(
+                                children: <Widget>[
+                                  new Icon(
+                                    Icons.directions_bus,
+                                    color: Colors.white
+                                  ),
+                                  new Text(
+                                    'Bus',
+                                    style: Theme.of(context).textTheme.body2.merge(TextStyle(color: Colors.white,))
+                                  )
+                                ]
+                              )
+                              
+                            ]
+                          ),
+                          new Row(
+                            children: <Widget>[
+                              Radio(
+                                value: 'rail',
+                                activeColor: Colors.white,
+                                groupValue: mode,
+                                onChanged: (String value) {
+                                  setState(() { mode = 'rail'; });
+                                },
+                              ),
+                              new Row(
+                                children: <Widget>[
+                                  new Icon(
+                                    Icons.directions_railway,
+                                    color: Colors.white
+                                  ),
+                                  new Text(
+                                    'Rail',
+                                    style: Theme.of(context).textTheme.body2.merge(TextStyle(color: Colors.white,))
+                                  )
+                                ]
+                              )
+                            ]
+                          ),
+                        ],
+                      ),
+                    ]
+                  ),
+                  new Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      Text(
+                        'DEPARTURE TIME',
+                        style: Theme.of(context).textTheme.body2.merge(TextStyle(
+                          color: Colors.white,
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.w500,
+                          )
+                        )
+                      ),
+                      new SizedBox(width: 8),
+                      new Container(
+                        width: (MediaQuery.of(context).size.width - 20) * 0.40,
+                        child: new SizedBox(
+                          width: double.infinity,
+                          child: RaisedButton(
+                            color: Colors.white,
+                            onPressed: () => _selectTime(context),
+                            child: new Container(
+                              alignment: Alignment.center,
+                              child: new Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                crossAxisAlignment: CrossAxisAlignment.center,
+                                children: <Widget>[
+                                  new Icon(
+                                    Icons.departure_board,
+                                    color: Theme.of(context).primaryColor,
+                                  ),
+                                  new SizedBox(width: 8.0),
+                                  Text(
+                                    time,
+                                    style: TextStyle(color: Theme.of(context).primaryColor,)
+                                  )
+                                ]
+                              )
+                            ),
+                          ),
+                        )
+                      ),
+                    ],
+                  ),
+                ]
+              )
+            ),
           ),
-          new SizedBox(height: 10.0),
-          Container(
+          new Container(
             margin: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 0.0),
-            child: new Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                new Text(
-                  'MODES',
-                  style: Theme.of(context).textTheme.body2.merge(TextStyle(
-                    color: Colors.black,
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.w500,
-                    )
-                  )
-                ),
-                new Row(
-                  children: <Widget>[
-                    new Row(
-                      children: <Widget>[
-                        Radio(
-                          autofocus: true,
-                          focusColor: Theme.of(context).primaryColor,
-                          groupValue: mode,
-                          value: '',
-                          onChanged: (String value) {
-                            setState(() { mode = ''; });
-                          },
-                        ),
-                        new Row(
-                          children: <Widget>[
-                            new Icon(Icons.rv_hookup),
-                            const Text('Mixed')
-                          ]
-                        )
-                      ]
-                    ),
-                    new Row(
-                      children: <Widget>[
-                        Radio(
-                          value: 'bus',
-                          focusColor: Theme.of(context).primaryColor,
-                          groupValue: mode,
-                          onChanged: (String value) {
-                            setState(() { mode = 'bus'; });
-                          },
-                        ),
-                        new Row(
-                          children: <Widget>[
-                            new Icon(Icons.directions_bus),
-                            const Text('Bus')
-                          ]
-                        )
-                        
-                      ]
-                    ),
-                    new Row(
-                      children: <Widget>[
-                        Radio(
-                          value: 'rail',
-                          focusColor: Theme.of(context).primaryColor,
-                          groupValue: mode,
-                          onChanged: (String value) {
-                            setState(() { mode = 'rail'; });
-                          },
-                        ),
-                        new Row(
-                          children: <Widget>[
-                            new Icon(Icons.directions_railway),
-                            const Text('Rail')
-                          ]
-                        )
-                      ]
-                    ),
-                  ],
-                ),
-              ]
-            )
-          ),
-          new SizedBox(height: 10.0),
-          Container(
-            margin: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 0.0),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text('My Departure Time is: ' + time),
-                RaisedButton(
-                  onPressed: () => _selectTime(context),
-                  child: Text('Set Time'),
-                ),
-              ],
-            )
-          ),
-          new SizedBox(height: 10.0),
-          Container(
-            margin: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 0.0),
-            alignment: Alignment.center,
             child: SizedBox(
               width: double.infinity, // match_parent
               child: RaisedButton(
                 color: Theme.of(context).primaryColor,
-                child: Text(
-                  'Search',
-                  style: TextStyle(color: Colors.white),
+                child: new Container(
+                  alignment: Alignment.center,
+                  child: new Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: <Widget>[
+                      new Icon(
+                        Icons.search,
+                        color: Colors.white,
+                      ),
+                      new SizedBox(width: 5),
+                      Text(
+                        'SEARCH',
+                        style: TextStyle(color: Colors.white),
+                      )
+                    ]
+                  )
                 ),
-                onPressed: () async {
-                  Map<String, String> query = {};
-                  if (from['lat'] != null) {
-                    query['flat'] = from['lat'];
-                  }
-                  if (from['lng'] != null) {
-                    query['flng'] = from['lng'];
-                  }
-                  if (to['lat'] != null) {
-                    query['tlat'] = to['lat'];
-                  }
-                  if (to['lng'] != null) {
-                    query['tlng'] = to['lng'];
-                  }
-                  query['time'] = time + ':00';
-                  query['mode'] = mode;
-                  query['type'] = type;
-                  print(query);
-                }
+                onPressed: _getListPlanner
               ),
             )
           )

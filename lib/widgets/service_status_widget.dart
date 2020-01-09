@@ -41,7 +41,7 @@ class ServiceStatusList extends StatelessWidget {
 
     return new Card(
       margin: EdgeInsets.fromLTRB(10.0, 0, 10.0, 0),
-      color: this.setting_cssclass == 'green' ? Colors.green : Colors.orange,
+      color: this.setting_cssclass == 'green' ? Colors.green : Colors.yellow,
       child: new Row(
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
