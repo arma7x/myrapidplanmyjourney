@@ -34,10 +34,12 @@ class _ServiceStatusState extends State<ServiceStatus> with AutomaticKeepAliveCl
           serviceStatusLoading = false;
         });
       } else {
-        //Fluttertoast.showToast(msg: "Network Error", toastLength: Toast.LENGTH_SHORT);
+        final snackBar = SnackBar(content: Text('Server Error'));
+        Scaffold.of(context).showSnackBar(snackBar);
       }
     } on Exception {
-      //Fluttertoast.showToast(msg: "Network Error", toastLength: Toast.LENGTH_SHORT);
+      final snackBar = SnackBar(content: Text('Network Error'));
+      Scaffold.of(context).showSnackBar(snackBar);
     }
     return null;
   }
@@ -56,10 +58,12 @@ class _ServiceStatusState extends State<ServiceStatus> with AutomaticKeepAliveCl
           serviceMsgLoading = false;
         });
       } else {
-        //Fluttertoast.showToast(msg: "Network Error", toastLength: Toast.LENGTH_SHORT);
+        final snackBar = SnackBar(content: Text('Server Error'));
+        Scaffold.of(context).showSnackBar(snackBar);
       }
     } on Exception {
-      //Fluttertoast.showToast(msg: "Network Error", toastLength: Toast.LENGTH_SHORT);
+      final snackBar = SnackBar(content: Text('Network Error'));
+      Scaffold.of(context).showSnackBar(snackBar);
     }
     return null;
   }
@@ -103,23 +107,38 @@ class _ServiceStatusState extends State<ServiceStatus> with AutomaticKeepAliveCl
     } else {
       return new Container(
         color: Theme.of(context).primaryColor,
-        padding: EdgeInsets.all(10),
+        padding: EdgeInsets.fromLTRB(10.0, 5.0, 10.0, 5.0),
         width: (MediaQuery.of(context).size.width),
         child: new Column(
           mainAxisAlignment: MainAxisAlignment.start,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: <Widget>[
             Text(
-              'As at ' + (listServiceMsg['msg_date'] != null ? listServiceMsg['msg_date'] : '-') + ', ' + (listServiceMsg['msg_time'] != null ? listServiceMsg['msg_time'] : '-'),
-              style: Theme.of(context).textTheme.body2.merge(TextStyle(color: Colors.white,))
+              '* As at ' + (listServiceMsg['msg_date'] != null ? listServiceMsg['msg_date'] : '-') + ', ' + (listServiceMsg['msg_time'] != null ? listServiceMsg['msg_time'] : '-'),
+              style: Theme.of(context).textTheme.body2.merge(TextStyle(
+                color: Colors.white,
+                fontSize: 16.0,
+                fontWeight: FontWeight.w500,
+                )
+              )
             ),
             Text(
-              'Rail Service Performance: ' + (listServiceMsg['msg_performance'] != null ? listServiceMsg['msg_performance'] : '-'),
-              style: Theme.of(context).textTheme.body2.merge(TextStyle(color: Colors.white,))
+              '* Rail Service Performance: ' + (listServiceMsg['msg_performance'] != null ? listServiceMsg['msg_performance'] : '-'),
+              style: Theme.of(context).textTheme.body2.merge(TextStyle(
+                color: Colors.white,
+                fontSize: 16.0,
+                fontWeight: FontWeight.w500,
+                )
+              )
             ),
             Text(
-              'Rail Ridership: ' + (listServiceMsg['msg_ridership'] != null ? listServiceMsg['msg_ridership'] : '-'),
-              style: Theme.of(context).textTheme.body2.merge(TextStyle(color: Colors.white,))
+              '* Rail Ridership: ' + (listServiceMsg['msg_ridership'] != null ? listServiceMsg['msg_ridership'] : '-'),
+              style: Theme.of(context).textTheme.body2.merge(TextStyle(
+                color: Colors.white,
+                fontSize: 16.0,
+                fontWeight: FontWeight.w500,
+                )
+              )
             ),
           ]
         )
@@ -136,7 +155,7 @@ class _ServiceStatusState extends State<ServiceStatus> with AutomaticKeepAliveCl
           child: new Column(
             children: <Widget>[
               _renderServiceMsg(),
-              new SizedBox(height: 10.0),
+              new SizedBox(height: 5.0),
               new Expanded(
                 child: new ListView(
                   children: _renderServiceStatus(),
@@ -146,10 +165,10 @@ class _ServiceStatusState extends State<ServiceStatus> with AutomaticKeepAliveCl
           )
         ),
         onRefresh: () async {
-          setState(() {
-            serviceStatusLoading = true;
-            serviceMsgLoading = true;
-          });
+          //setState(() {
+          //  serviceStatusLoading = true;
+          //  serviceMsgLoading = true;
+          //});
           await _getListServiceStatus();
           await _getListServiceMsg();
           return null;

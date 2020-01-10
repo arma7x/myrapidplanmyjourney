@@ -47,6 +47,7 @@ class ServiceStatusList extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           new Container(
+            color: Colors.white,
             width: (MediaQuery.of(context).size.width - 20) * 0.20,
             height: (MediaQuery.of(context).size.width - 20) * 0.20,
             child: new ClipRect(
@@ -79,7 +80,7 @@ class ServiceStatusList extends StatelessWidget {
               children: <Widget>[
                 new Text(
                   this.service_name,
-                  style: Theme.of(context).textTheme.body2.merge(TextStyle(color: Colors.white,))
+                  style: Theme.of(context).textTheme.body2.merge(TextStyle(color: Colors.white, fontWeight: FontWeight.w500))
                 ),
                 new Text(
                   this.service_desc,

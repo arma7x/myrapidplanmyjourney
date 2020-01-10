@@ -12,6 +12,7 @@ class PlanMyJourney extends StatefulWidget {
 
 class _PlanMyJourneyState extends State<PlanMyJourney> with FragmentUtils, AutomaticKeepAliveClientMixin<PlanMyJourney> {
 
+  List<dynamic> data = [];
   Map<String, String> from = {};
   final TextEditingController _fromController = TextEditingController();
   Map<String, String> to = {};
@@ -35,12 +36,117 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with FragmentUtils, Autom
         final responseBody = json.decode(response.body);
         return responseBody['data'];
       } else {
-        //Fluttertoast.showToast(msg: "Network Error", toastLength: Toast.LENGTH_SHORT);
+        final snackBar = SnackBar(content: Text('Server Error'));
+        Scaffold.of(context).showSnackBar(snackBar);
       }
     } on Exception {
-      //Fluttertoast.showToast(msg: "Network Error", toastLength: Toast.LENGTH_SHORT);
+      final snackBar = SnackBar(content: Text('Network Error'));
+      Scaffold.of(context).showSnackBar(snackBar);
     }
     return <dynamic>[];
+  }
+
+  Widget _renderRouteOptions(List<dynamic> options) {
+    int idx = 0;
+    List<Widget> routes = [];
+    for(var i in options) {
+      routes.add(
+        Container(
+          height: 58,
+          child: new Row(
+            children: <Widget>[
+              new Container(
+                color: Colors.grey[100],
+                padding: EdgeInsets.fromLTRB(5.0, 10.0, 5.0, 10.0),
+                width: (MediaQuery.of(context).size.width) * 0.22,
+                child: new Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Text('ETA'),
+                    Text(i['t_arrival_time'].toString().replaceAll(' ', '')),
+                  ]
+                )
+              ),
+              new Container(
+                color: Colors.white,
+                padding: EdgeInsets.fromLTRB(5.0, 10.0, 5.0, 10.0),
+                width: (MediaQuery.of(context).size.width) * 0.16,
+                child: new Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Text(i['t_duration_hour'].toString()),
+                    Text('Hours'),
+                  ]
+                ),
+              ),
+              new Container(
+                color: Colors.white,
+                padding: EdgeInsets.fromLTRB(5.0, 10.0, 5.0, 10.0),
+                width: (MediaQuery.of(context).size.width) * 0.14,
+                child: new Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Text(i['t_duration_min'].toString()),
+                    Text('Mins'),
+                  ]
+                ),
+              ),
+              new Container(
+                color: Colors.grey[100],
+                padding: EdgeInsets.fromLTRB(5.0, 10.0, 5.0, 10.0),
+                width: (MediaQuery.of(context).size.width) * 0.15,
+                child: new Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    Text(i['t_distance'].toString()),
+                    Text('KM'),
+                  ]
+                ),
+              ),
+              new Container(
+                color: Theme.of(context).primaryColor,
+                width: (MediaQuery.of(context).size.width) * 0.33,
+                child: new Material(
+                  child: new InkWell(
+                    onLongPress: () {
+                      final snackBar = SnackBar(content: Text(i['t_route'].toString().toUpperCase()));
+                      Scaffold.of(context).showSnackBar(snackBar);
+                    },
+                    onTap: () {
+                      print(i);
+                    },
+                    child: new Container(
+                      padding: EdgeInsets.fromLTRB(5.0, 10.0, 5.0, 10.0),
+                      width: (MediaQuery.of(context).size.width) * 0.33,
+                      child: new Center(
+                        child: Text(
+                          'VIEW DETAIL',
+                          style: TextStyle(color: Colors.white, fontWeight: FontWeight.w500)
+                        )
+                      )
+                    )
+                  ),
+                  color: Colors.transparent,
+                )
+              ),
+            ]
+          )
+        )
+      );
+      idx++;
+      if (idx != options.length) {
+        routes.add(new Divider(height: 3, color: Colors.grey));
+      }
+    }
+    return new SingleChildScrollView(
+      child: new Column(
+        children: routes,
+      )
+    );
   }
 
   void _getListPlanner() async {
@@ -59,13 +165,34 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with FragmentUtils, Autom
       showloadingDialog(false, context);
       if (response.statusCode == 200) {
         final responseBody = json.decode(response.body);
-        print(responseBody['data']);
+        if (responseBody['data'].length > 0) {
+          if (responseBody['data'][0]['a'].length > 0) {
+            setState(() { data = responseBody['data'][0]['a']; });
+            showModalBottomSheet<void>(
+              context: context,
+              builder: (BuildContext _) {
+                return _renderRouteOptions(responseBody['data'][0]['a']);
+              },
+              backgroundColor: Colors.white,
+              isScrollControlled: false
+            );
+            return;
+          }
+        }
+        final snackBar = SnackBar(content: Text('We are sorry, no results found for option chosen. Please try other modes'));
+        Scaffold.of(context).showSnackBar(snackBar);
       } else {
-        //Fluttertoast.showToast(msg: "Network Error", toastLength: Toast.LENGTH_SHORT);
+        final snackBar = SnackBar(content: Text('Server Error'));
+        Scaffold.of(context).showSnackBar(snackBar);
       }
     } on Exception {
-      //Fluttertoast.showToast(msg: "Network Error", toastLength: Toast.LENGTH_SHORT);
+      final snackBar = SnackBar(content: Text('Network Error'));
+      Scaffold.of(context).showSnackBar(snackBar);
     }
+    setState(() {
+      data = [];
+    });
+    return;
   }
 
   Future<Null> _selectTime(BuildContext context) async {
@@ -74,7 +201,7 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with FragmentUtils, Autom
       initialTime: selectedTime,
       builder: (BuildContext context, Widget child) {
         return MediaQuery(
-          data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: true),
+          data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: false),
           child: child,
         );
       },
@@ -138,6 +265,7 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with FragmentUtils, Autom
                         Icons.location_searching,
                         size: 24.0,
                       ),
+                      contentPadding: const EdgeInsets.fromLTRB(0, 16.0, 0, 0),
                       filled: true,
                       fillColor: Colors.white,
                       border: InputBorder.none,
@@ -190,6 +318,7 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with FragmentUtils, Autom
                         Icons.flag,
                         size: 24.0,
                       ),
+                      contentPadding: const EdgeInsets.fromLTRB(0, 16.0, 0, 0),
                       filled: true,
                       fillColor: Colors.white,
                       border: InputBorder.none,
@@ -407,7 +536,7 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with FragmentUtils, Autom
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
                       Text(
-                        'DEPARTURE TIME',
+                        'MY DEPARTURE TIME',
                         style: Theme.of(context).textTheme.body2.merge(TextStyle(
                           color: Colors.white,
                           fontSize: 16.0,
@@ -435,7 +564,7 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with FragmentUtils, Autom
                                   ),
                                   new SizedBox(width: 8.0),
                                   Text(
-                                    time,
+                                    selectedTime.format(context),
                                     style: TextStyle(color: Theme.of(context).primaryColor,)
                                   )
                                 ]
