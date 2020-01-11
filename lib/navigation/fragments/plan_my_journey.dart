@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:myrapidplanmyjourney/api.dart';
 import 'package:myrapidplanmyjourney/navigation/fragments.dart' show FragmentUtils;
+import 'package:myrapidplanmyjourney/navigation/navigations.dart';
 
 class PlanMyJourney extends StatefulWidget {
   @override
@@ -117,7 +118,11 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with FragmentUtils, Autom
                       Scaffold.of(context).showSnackBar(snackBar);
                     },
                     onTap: () {
-                      print(i);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (BuildContext context) => new RouteDetail.fromJson(i))
+                      );
                     },
                     child: new Container(
                       padding: EdgeInsets.fromLTRB(5.0, 10.0, 5.0, 10.0),
