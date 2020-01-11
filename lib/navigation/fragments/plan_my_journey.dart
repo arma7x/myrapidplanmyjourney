@@ -536,7 +536,7 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with FragmentUtils, Autom
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: <Widget>[
                       Text(
-                        'MY DEPARTURE TIME',
+                        'DEPARTURE TIME',
                         style: Theme.of(context).textTheme.body2.merge(TextStyle(
                           color: Colors.white,
                           fontSize: 16.0,
