@@ -98,9 +98,9 @@ class _RouteDetailState extends State<RouteDetail> {
     List<Widget> prices = [];
     List<Widget> prices_row = [];
     prices_row.add(_renderPrice(
-      new Icon(Icons.local_atm, color: Colors.white),
+      new Icon(Icons.local_atm, color: Colors.white, size: 38),
       Text(
-        'FARE PRICES',
+        ' FARE PRICES',
         style: Theme.of(context).textTheme.body2.merge(TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500))
       ),
       Theme.of(context).primaryColor
@@ -143,6 +143,62 @@ class _RouteDetailState extends State<RouteDetail> {
     return prices;
   }
 
+  Widget _renderDetail() {
+    List<Widget> details = [];
+    details.add(new Center(
+      child: new Text(
+        'Transport Detail',
+        style: Theme.of(context).textTheme.body2.merge(TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500))
+      )
+    ));
+    details.add(new SizedBox(height: 10));
+    for (var i in widget.t_detail) {
+      details.add(new Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          new Container(
+            width: (MediaQuery.of(context).size.width - 20) * 0.20,
+            child: new Text(
+              i['time'],
+              style: Theme.of(context).textTheme.body2.merge(TextStyle(color: Colors.white, fontWeight: FontWeight.w500))
+            ),
+          ),
+          i['time'].contains(':') 
+          ? new Icon(Icons.lens, color: Colors.white, size: 22)
+          : new Container(
+            width: (MediaQuery.of(context).size.width - 20) * 0.02,
+            height: (MediaQuery.of(context).size.width - 20) * 0.25,
+            decoration: new BoxDecoration(
+              color: Colors.white,
+              borderRadius: new BorderRadius.only(
+                topLeft: const Radius.circular(3.0),
+                topRight: const Radius.circular(3.0),
+                bottomLeft: const Radius.circular(3.0),
+                bottomRight: const Radius.circular(3.0),
+              )
+            )
+          ),
+          new Container(
+            width: (MediaQuery.of(context).size.width - 20) * 0.70,
+            child: new Text(
+              i['place'],
+              style: Theme.of(context).textTheme.body2.merge(TextStyle(color: Colors.white, fontWeight: FontWeight.w500))
+            )
+          ),
+        ]
+      ));
+    }
+    return new Container(
+      color: Colors.red,
+      padding: EdgeInsets.fromLTRB(10.0, 10.0, 10.0, 10.0),
+      width: (MediaQuery.of(context).size.width),
+      child: new Column(
+        children: <Widget>[...details],
+      )
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
 
@@ -155,7 +211,7 @@ class _RouteDetailState extends State<RouteDetail> {
           child: new ListView(
             children: <Widget>[
               ..._renderFarePrices(),
-              Text(json.encode(widget.t_detail)),
+              _renderDetail(),
               new Container(
                 color: Theme.of(context).primaryColor,
                 padding: EdgeInsets.fromLTRB(10.0, 10, 10.0, 10),
@@ -165,14 +221,17 @@ class _RouteDetailState extends State<RouteDetail> {
                       '**Interchange Station : Passengers are NOT REQUIRED to exit station and may proceed to interchange station.',
                       style: Theme.of(context).textTheme.body2.merge(TextStyle(color: Colors.white, fontWeight: FontWeight.w500))
                     ),
+                    new SizedBox(height: 5),
                     Text(
                       '**Connecting Station : Passengers are REQUIRED to exit and purchase new token at the connecting station.',
                       style: Theme.of(context).textTheme.body2.merge(TextStyle(color: Colors.white, fontWeight: FontWeight.w500))
                     ),
+                    new SizedBox(height: 5),
                     Text(
                       '**Rapid KL Bus and MRT Feeder Bus only accept cashless mode.',
                       style: Theme.of(context).textTheme.body2.merge(TextStyle(color: Colors.white, fontWeight: FontWeight.w500))
                     ),
+                    new SizedBox(height: 5),
                     Text(
                       '**Disclaimer: These directions are for planning purposes only. You may find that construction projects, traffic, weather, or other events may cause conditions to differ from the map results, and you should plan your route accordingly. You must obey all signs or notices regarding your route.',
                       style: Theme.of(context).textTheme.body2.merge(TextStyle(color: Colors.white, fontWeight: FontWeight.w500))
