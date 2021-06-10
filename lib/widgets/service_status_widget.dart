@@ -27,7 +27,7 @@ class ServiceStatusList extends StatelessWidget {
     return new ServiceStatusList._(
       service_id: json['service_id'],
       service_name: json['service_name'],
-      service_logo: 'https://myrapid.com.my/clients/Myrapid_Prasarana_37CB56E7-2301-4302-9B98-DFC127DD17E9/contentms/img/' + json['service_logo'],
+      service_logo: 'https://www.myrapid.com.my/clients/Myrapid_Prasarana_37CB56E7-2301-4302-9B98-DFC127DD17E9/contentms/img/' + json['service_logo'],
       setting_id: json['setting_id'],
       service_desc: json['service_desc'],
       action_By: json['action_By'],

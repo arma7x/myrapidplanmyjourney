@@ -233,7 +233,7 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with FragmentUtils, Autom
       color: Colors.white,
       child: new ListView(
         children: <Widget>[
-          new SizedBox(height: 10.0),
+          new SizedBox(height: 5.0),
           new Container(
             decoration: new BoxDecoration(
               color: Colors.red,
@@ -302,7 +302,7 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with FragmentUtils, Autom
                     _fromController.text = from['label'];
                   },
                 ),
-                new SizedBox(height: 10.0),
+                new SizedBox(height: 5.0),
                 new Text(
                   "DESTINATION",
                   style: Theme.of(context).textTheme.body2.merge(TextStyle(
@@ -358,7 +358,7 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with FragmentUtils, Autom
               ]
             )
           ),
-          new SizedBox(height: 10.0),
+          new SizedBox(height: 5.0),
           new Container(
             decoration: new BoxDecoration(
               color: Theme.of(context).primaryColor,
@@ -584,6 +584,7 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with FragmentUtils, Autom
               )
             ),
           ),
+          new SizedBox(height: 5.0),
           new Container(
             margin: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 0.0),
             child: SizedBox(
