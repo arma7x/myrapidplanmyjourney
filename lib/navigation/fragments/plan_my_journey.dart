@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_typeahead/flutter_typeahead.dart';
 import 'package:myrapidplanmyjourney/api.dart';
@@ -47,6 +48,21 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with FragmentUtils, Autom
     return <dynamic>[];
   }
 
+  String _humanReadableDuration(int duration) {
+    if ((duration/60) < 60) {
+      return (duration/60).toStringAsFixed(0) + " min";
+    } else {
+      return ((duration/60)/60).toStringAsFixed(0) + " hour & " + ((duration/60)%60).toStringAsFixed(0) + " min";
+    }
+    return "Unknown";
+  }
+
+  String _calculateETA(int duration) {
+    var parsedDate = DateTime.parse(new DateTime.now().toString().substring(0,10) + ' ' + time + ':00');
+    var eta = parsedDate.add(Duration(seconds: duration));
+    return DateFormat('hh:mm a').format(eta).toString();
+  }
+
   Widget _renderRouteOptions(List<dynamic> options) {
     int idx = 0;
     List<Widget> routes = [];
@@ -59,70 +75,56 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with FragmentUtils, Autom
               new Container(
                 color: Colors.grey[100],
                 padding: EdgeInsets.fromLTRB(5.0, 10.0, 5.0, 10.0),
-                width: (MediaQuery.of(context).size.width) * 0.22,
+                width: (MediaQuery.of(context).size.width) * 0.25,
                 child: new Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
                     Text('ETA'),
-                    Text(i['t_arrival_time'].toString().replaceAll(' ', '')),
+                    Text(_calculateETA(i['total_duration'])),
                   ]
                 )
               ),
               new Container(
                 color: Colors.white,
                 padding: EdgeInsets.fromLTRB(5.0, 10.0, 5.0, 10.0),
-                width: (MediaQuery.of(context).size.width) * 0.16,
+                width: (MediaQuery.of(context).size.width) * 0.25,
                 child: new Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
-                    Text(i['t_duration_hour'].toString()),
-                    Text('Hours'),
-                  ]
-                ),
-              ),
-              new Container(
-                color: Colors.white,
-                padding: EdgeInsets.fromLTRB(5.0, 10.0, 5.0, 10.0),
-                width: (MediaQuery.of(context).size.width) * 0.14,
-                child: new Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: <Widget>[
-                    Text(i['t_duration_min'].toString()),
-                    Text('Mins'),
+                    Text(_humanReadableDuration(i['total_duration'])),
+                    Text('Duration'),
                   ]
                 ),
               ),
               new Container(
                 color: Colors.grey[100],
                 padding: EdgeInsets.fromLTRB(5.0, 10.0, 5.0, 10.0),
-                width: (MediaQuery.of(context).size.width) * 0.15,
+                width: (MediaQuery.of(context).size.width) * 0.25,
                 child: new Column(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: <Widget>[
-                    Text(i['t_distance'].toString()),
+                    Text((i['total_distance']/1000).toStringAsFixed(2)),
                     Text('KM'),
                   ]
                 ),
               ),
               new Container(
                 color: Theme.of(context).primaryColor,
-                width: (MediaQuery.of(context).size.width) * 0.33,
+                width: (MediaQuery.of(context).size.width) * 0.25,
                 child: new Material(
                   child: new InkWell(
                     onLongPress: () {
-                      final snackBar = SnackBar(content: Text(i['t_route'].toString().toUpperCase()));
-                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
+                      // final snackBar = SnackBar(content: Text(i['t_route'].toString().toUpperCase()));
+                      // ScaffoldMessenger.of(context).showSnackBar(snackBar);
                     },
                     onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (BuildContext context) => new RouteDetail.fromJson(i))
-                      );
+                      //Navigator.push(
+                      //  context,
+                      //  MaterialPageRoute(builder: (BuildContext context) => new RouteDetail.fromJson(i))
+                      //);
                     },
                     child: new Container(
                       padding: EdgeInsets.fromLTRB(5.0, 10.0, 5.0, 10.0),
@@ -173,15 +175,14 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with FragmentUtils, Autom
         final routes = Map.from(responseBody['data']!)['routes']!;
         if (routes.length > 0) {
           setState(() { data = routes; });
-          print(data);
-          //showModalBottomSheet<void>(
-            //context: context,
-            //builder: (BuildContext _) {
-              //return _renderRouteOptions(responseBody['data'][0]['a']);
-            //},
-            //backgroundColor: Colors.white,
-            //isScrollControlled: false
-          //);
+          showModalBottomSheet<void>(
+            context: context,
+            builder: (BuildContext _) {
+              return _renderRouteOptions(data);
+            },
+            backgroundColor: Colors.white,
+            isScrollControlled: false
+          );
           return;
         }
         final snackBar = SnackBar(content: Text('We are sorry, no results found for option chosen. Please try other modes'));
@@ -616,11 +617,13 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with FragmentUtils, Autom
                         Icons.search,
                         color: Colors.white,
                       ),
-                      new SizedBox(width: 5),
-                      Text(
-                        'SEARCH',
-                        style: TextStyle(color: Colors.white),
-                      )
+                      Padding(
+                        padding: EdgeInsets.fromLTRB(10.0, 15.0, 10.0, 15.0),
+                        child: Text(
+                          'SEARCH',
+                          style: TextStyle(color: Colors.white),
+                        )
+                      ),
                     ]
                   )
                 ),

@@ -7,11 +7,11 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'MyRapid - Plan My Journey',
+      title: 'RapidKL - Plan My Journey',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'MyRapid - Plan My Journey'),
+      home: MyHomePage(title: 'RapidKL - Plan My Journey'),
     );
   }
 }
