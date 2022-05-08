@@ -35,14 +35,14 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with FragmentUtils, Autom
       final response = await Api.ListStreetAutocomplete(query);
       if (response.statusCode == 200) {
         final responseBody = json.decode(response.body);
-        return responseBody['data'];
+        return Map.from(responseBody['data']!)['results']!;
       } else {
         final snackBar = SnackBar(content: Text('Server Error'));
-        Scaffold.of(context).showSnackBar(snackBar);
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
       }
     } on Exception {
       final snackBar = SnackBar(content: Text('Network Error'));
-      Scaffold.of(context).showSnackBar(snackBar);
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
     return <dynamic>[];
   }
@@ -115,7 +115,7 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with FragmentUtils, Autom
                   child: new InkWell(
                     onLongPress: () {
                       final snackBar = SnackBar(content: Text(i['t_route'].toString().toUpperCase()));
-                      Scaffold.of(context).showSnackBar(snackBar);
+                      ScaffoldMessenger.of(context).showSnackBar(snackBar);
                     },
                     onTap: () {
                       Navigator.push(
@@ -157,10 +157,10 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with FragmentUtils, Autom
   void _getListPlanner() async {
     try {
       Map<String, String> query = {
-        'flat': from['lat'] != null ? from['lat'] : '',
-        'flng': from['lng'] != null ? from['lng'] : '',
-        'tlat': to['lat'] != null ? to['lat'] : '',
-        'tlng': to['lng'] != null ? to['lng'] : '',
+        'flat': from['lat'] ?? '',
+        'flng': from['lng'] ?? '',
+        'tlat': to['lat'] ?? '',
+        'tlng': to['lng'] ?? '',
         'time': time + ':00',
         'mode': mode,
         'type': type,
@@ -185,14 +185,14 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with FragmentUtils, Autom
           }
         }
         final snackBar = SnackBar(content: Text('We are sorry, no results found for option chosen. Please try other modes'));
-        Scaffold.of(context).showSnackBar(snackBar);
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
       } else {
         final snackBar = SnackBar(content: Text('Server Error'));
-        Scaffold.of(context).showSnackBar(snackBar);
+        ScaffoldMessenger.of(context).showSnackBar(snackBar);
       }
     } on Exception {
       final snackBar = SnackBar(content: Text('Network Error'));
-      Scaffold.of(context).showSnackBar(snackBar);
+      ScaffoldMessenger.of(context).showSnackBar(snackBar);
     }
     setState(() {
       data = [];
@@ -200,14 +200,14 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with FragmentUtils, Autom
     return;
   }
 
-  Future<Null> _selectTime(BuildContext context) async {
-    final TimeOfDay picked = await showTimePicker(
+  Future<TimeOfDay?> _selectTime(BuildContext context) async {
+    final TimeOfDay? picked = await showTimePicker(
       context: context,
       initialTime: selectedTime,
-      builder: (BuildContext context, Widget child) {
+      builder: (BuildContext context, Widget? child) {
         return MediaQuery(
           data: MediaQuery.of(context).copyWith(alwaysUse24HourFormat: false),
-          child: child,
+          child: child!,
         );
       },
     );
@@ -228,6 +228,7 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with FragmentUtils, Autom
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     // TODO: implement build
     return new Container(
       color: Colors.white,
@@ -252,7 +253,7 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with FragmentUtils, Autom
               children: <Widget>[
                 new Text(
                   "CURRENT LOCATION",
-                  style: Theme.of(context).textTheme.body2.merge(TextStyle(
+                  style: Theme.of(context).textTheme.bodyText2?.merge(TextStyle(
                     color: Colors.white,
                     fontSize: 16.0,
                     fontWeight: FontWeight.w500,
@@ -281,14 +282,14 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with FragmentUtils, Autom
                   suggestionsCallback: (pattern) async {
                     return await _getListStreetAutocomplete(pattern);
                   },
-                  itemBuilder: (context, suggestion) {
+                  itemBuilder: (context, dynamic suggestion) {
                     return ListTile(
                       leading: Icon(Icons.my_location),
-                      title: Text(suggestion['label']),
-                      subtitle: Text(suggestion['id']),
+                      title: Text(suggestion['label']!),
+                      subtitle: Text(suggestion['id']!),
                     );
                   },
-                  onSuggestionSelected: (suggestion) {
+                  onSuggestionSelected: (dynamic suggestion) {
                     Map<String, String> tempFrom = {};
                     suggestion.forEach((k, v) {
                       tempFrom[k] = v;
@@ -299,13 +300,13 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with FragmentUtils, Autom
                       }
                     });
                     setState(() { from = tempFrom; });
-                    _fromController.text = from['label'];
+                    _fromController.text = from['label']!;
                   },
                 ),
                 new SizedBox(height: 5.0),
                 new Text(
                   "DESTINATION",
-                  style: Theme.of(context).textTheme.body2.merge(TextStyle(
+                  style: Theme.of(context).textTheme.bodyText2?.merge(TextStyle(
                     color: Colors.white,
                     fontSize: 16.0,
                     fontWeight: FontWeight.w500,
@@ -334,14 +335,14 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with FragmentUtils, Autom
                   suggestionsCallback: (pattern) async {
                     return await _getListStreetAutocomplete(pattern);
                   },
-                  itemBuilder: (context, suggestion) {
+                  itemBuilder: (context, dynamic suggestion) {
                     return ListTile(
                       leading: Icon(Icons.my_location),
-                      title: Text(suggestion['label']),
-                      subtitle: Text(suggestion['id']),
+                      title: Text(suggestion['label']!),
+                      subtitle: Text(suggestion['id']!),
                     );
                   },
-                  onSuggestionSelected: (suggestion) {
+                  onSuggestionSelected: (dynamic suggestion) {
                     Map<String, String> tempTo = {};
                     suggestion.forEach((k, v) {
                       tempTo[k] = v;
@@ -352,7 +353,7 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with FragmentUtils, Autom
                       }
                     });
                     setState(() { to = tempTo; });
-                    _toController.text = to['label'];
+                    _toController.text = to['label']!;
                   },
                 )
               ]
@@ -381,7 +382,7 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with FragmentUtils, Autom
                     children: <Widget>[
                       new Text(
                         'OPTIONS',
-                        style: Theme.of(context).textTheme.body2.merge(TextStyle(
+                        style: Theme.of(context).textTheme.bodyText2?.merge(TextStyle(
                           color: Colors.white,
                           fontSize: 16.0,
                           fontWeight: FontWeight.w500,
@@ -397,7 +398,7 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with FragmentUtils, Autom
                                 activeColor: Colors.white,
                                 groupValue: type,
                                 value: '',
-                                onChanged: (String value) {
+                                onChanged: (String? value) {
                                   setState(() { type = ''; });
                                 },
                               ),
@@ -409,7 +410,7 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with FragmentUtils, Autom
                                   ),
                                   new Text(
                                     'Shortest Time',
-                                    style: Theme.of(context).textTheme.body2.merge(TextStyle(color: Colors.white,))
+                                    style: Theme.of(context).textTheme.bodyText2?.merge(TextStyle(color: Colors.white,))
                                   )
                                 ]
                               )
@@ -421,7 +422,7 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with FragmentUtils, Autom
                                 value: 'leasttransit',
                                 activeColor: Colors.white,
                                 groupValue: type,
-                                onChanged: (String value) {
+                                onChanged: (String? value) {
                                   setState(() { type = 'leasttransit'; });
                                 },
                               ),
@@ -433,7 +434,7 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with FragmentUtils, Autom
                                   ),
                                   new Text(
                                     'Least Transfer',
-                                    style: Theme.of(context).textTheme.body2.merge(TextStyle(color: Colors.white,))
+                                    style: Theme.of(context).textTheme.bodyText2?.merge(TextStyle(color: Colors.white,))
                                   )
                                 ]
                               )
@@ -449,7 +450,7 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with FragmentUtils, Autom
                     children: <Widget>[
                       new Text(
                         'MODES',
-                        style: Theme.of(context).textTheme.body2.merge(TextStyle(
+                        style: Theme.of(context).textTheme.bodyText2?.merge(TextStyle(
                           color: Colors.white,
                           fontSize: 16.0,
                           fontWeight: FontWeight.w500,
@@ -465,7 +466,7 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with FragmentUtils, Autom
                                 activeColor: Colors.white,
                                 groupValue: mode,
                                 value: '',
-                                onChanged: (String value) {
+                                onChanged: (String? value) {
                                   setState(() { mode = ''; });
                                 },
                               ),
@@ -477,7 +478,7 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with FragmentUtils, Autom
                                   ),
                                   new Text(
                                     'Mixed',
-                                    style: Theme.of(context).textTheme.body2.merge(TextStyle(color: Colors.white,))
+                                    style: Theme.of(context).textTheme.bodyText2?.merge(TextStyle(color: Colors.white,))
                                   )
                                 ]
                               )
@@ -489,7 +490,7 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with FragmentUtils, Autom
                                 value: 'bus',
                                 activeColor: Colors.white,
                                 groupValue: mode,
-                                onChanged: (String value) {
+                                onChanged: (String? value) {
                                   setState(() { mode = 'bus'; });
                                 },
                               ),
@@ -501,7 +502,7 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with FragmentUtils, Autom
                                   ),
                                   new Text(
                                     'Bus',
-                                    style: Theme.of(context).textTheme.body2.merge(TextStyle(color: Colors.white,))
+                                    style: Theme.of(context).textTheme.bodyText2?.merge(TextStyle(color: Colors.white,))
                                   )
                                 ]
                               )
@@ -514,7 +515,7 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with FragmentUtils, Autom
                                 value: 'rail',
                                 activeColor: Colors.white,
                                 groupValue: mode,
-                                onChanged: (String value) {
+                                onChanged: (String? value) {
                                   setState(() { mode = 'rail'; });
                                 },
                               ),
@@ -526,7 +527,7 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with FragmentUtils, Autom
                                   ),
                                   new Text(
                                     'Rail',
-                                    style: Theme.of(context).textTheme.body2.merge(TextStyle(color: Colors.white,))
+                                    style: Theme.of(context).textTheme.bodyText2?.merge(TextStyle(color: Colors.white,))
                                   )
                                 ]
                               )
@@ -542,7 +543,7 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with FragmentUtils, Autom
                     children: <Widget>[
                       Text(
                         'DEPARTURE TIME',
-                        style: Theme.of(context).textTheme.body2.merge(TextStyle(
+                        style: Theme.of(context).textTheme.bodyText2?.merge(TextStyle(
                           color: Colors.white,
                           fontSize: 16.0,
                           fontWeight: FontWeight.w500,
@@ -554,8 +555,10 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with FragmentUtils, Autom
                         width: (MediaQuery.of(context).size.width - 20) * 0.40,
                         child: new SizedBox(
                           width: double.infinity,
-                          child: RaisedButton(
-                            color: Colors.white,
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              primary: Colors.white,
+                            ),
                             onPressed: () => _selectTime(context),
                             child: new Container(
                               alignment: Alignment.center,
@@ -589,8 +592,10 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with FragmentUtils, Autom
             margin: EdgeInsets.fromLTRB(10.0, 0.0, 10.0, 0.0),
             child: SizedBox(
               width: double.infinity, // match_parent
-              child: RaisedButton(
-                color: Theme.of(context).primaryColor,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  primary: Theme.of(context).primaryColor,
+                ),
                 child: new Container(
                   alignment: Alignment.center,
                   child: new Row(

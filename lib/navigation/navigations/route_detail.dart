@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 
 class RouteDetail extends StatefulWidget {
@@ -25,28 +24,27 @@ class RouteDetail extends StatefulWidget {
   final String t_arrival_time;
 
   RouteDetail._(
-      {Key key,
-      this.t_id,
-      this.t_no,
-      this.t_depart,
-      this.t_depart_hour,
-      this.t_depart_min,
-      this.t_depart_tt,
-      this.t_route,
-      this.t_distance,
-      this.t_duration,
-      this.t_duration_hour,
-      this.t_duration_min,
-      this.t_fare,
-      this.t_fare_price,
-      this.t_transport,
-      this.t_steps,
-      this.t_detail,
-      this.t_geometry,
-      this.t_geometry_point,
-      this.t_stop_name,
-      this.t_leg,
-      this.t_arrival_time});
+      {required this.t_id,
+      required this.t_no,
+      required this.t_depart,
+      required this.t_depart_hour,
+      required this.t_depart_min,
+      required this.t_depart_tt,
+      required this.t_route,
+      required this.t_distance,
+      required this.t_duration,
+      required this.t_duration_hour,
+      required this.t_duration_min,
+      required this.t_fare,
+      required this.t_fare_price,
+      required this.t_transport,
+      required this.t_steps,
+      required this.t_detail,
+      required this.t_geometry,
+      required this.t_geometry_point,
+      required this.t_stop_name,
+      required this.t_leg,
+      required this.t_arrival_time});
 
   factory RouteDetail.fromJson(Map<String, dynamic> json) {
     return new RouteDetail._(
@@ -101,7 +99,7 @@ class _RouteDetailState extends State<RouteDetail> {
       new Icon(Icons.local_atm, color: Colors.white, size: 38),
       Text(
         ' FARE PRICES',
-        style: Theme.of(context).textTheme.body2.merge(TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500))
+        style: Theme.of(context).textTheme.bodyText2?.merge(TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500))
       ),
       Theme.of(context).primaryColor
     ));
@@ -127,11 +125,11 @@ class _RouteDetailState extends State<RouteDetail> {
       prices_row.add(_renderPrice(
         Text(
           k.toUpperCase() + ': ',
-          style: Theme.of(context).textTheme.body2.merge(TextStyle(color: Colors.white, fontWeight: FontWeight.w500))
+          style: Theme.of(context).textTheme.bodyText2?.merge(TextStyle(color: Colors.white, fontWeight: FontWeight.w500))
         ),
         Text(
           v.toUpperCase(),
-          style: Theme.of(context).textTheme.body2.merge(TextStyle(color: Colors.white, fontWeight: FontWeight.w500))
+          style: Theme.of(context).textTheme.bodyText2?.merge(TextStyle(color: Colors.white, fontWeight: FontWeight.w500))
         ),
         bg_color
       ));
@@ -148,7 +146,7 @@ class _RouteDetailState extends State<RouteDetail> {
     details.add(new Center(
       child: new Text(
         'Transport Detail',
-        style: Theme.of(context).textTheme.body2.merge(TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500))
+        style: Theme.of(context).textTheme.bodyText2?.merge(TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.w500))
       )
     ));
     details.add(new SizedBox(height: 10));
@@ -161,7 +159,7 @@ class _RouteDetailState extends State<RouteDetail> {
             width: (MediaQuery.of(context).size.width - 20) * 0.20,
             child: new Text(
               i['time'],
-              style: Theme.of(context).textTheme.body2.merge(TextStyle(color: Colors.white, fontWeight: FontWeight.w500))
+              style: Theme.of(context).textTheme.bodyText2?.merge(TextStyle(color: Colors.white, fontWeight: FontWeight.w500))
             ),
           ),
           i['time'].contains(':') 
@@ -183,7 +181,7 @@ class _RouteDetailState extends State<RouteDetail> {
             width: (MediaQuery.of(context).size.width - 20) * 0.70,
             child: new Text(
               i['place'],
-              style: Theme.of(context).textTheme.body2.merge(TextStyle(color: Colors.white, fontWeight: FontWeight.w500))
+              style: Theme.of(context).textTheme.bodyText2?.merge(TextStyle(color: Colors.white, fontWeight: FontWeight.w500))
             )
           ),
         ]
@@ -219,22 +217,22 @@ class _RouteDetailState extends State<RouteDetail> {
                   children: <Widget>[
                     Text(
                       '**Interchange Station : Passengers are NOT REQUIRED to exit station and may proceed to interchange station.',
-                      style: Theme.of(context).textTheme.body2.merge(TextStyle(color: Colors.white, fontWeight: FontWeight.w500))
+                      style: Theme.of(context).textTheme.bodyText2?.merge(TextStyle(color: Colors.white, fontWeight: FontWeight.w500))
                     ),
                     new SizedBox(height: 5),
                     Text(
                       '**Connecting Station : Passengers are REQUIRED to exit and purchase new token at the connecting station.',
-                      style: Theme.of(context).textTheme.body2.merge(TextStyle(color: Colors.white, fontWeight: FontWeight.w500))
+                      style: Theme.of(context).textTheme.bodyText2?.merge(TextStyle(color: Colors.white, fontWeight: FontWeight.w500))
                     ),
                     new SizedBox(height: 5),
                     Text(
                       '**Rapid KL Bus and MRT Feeder Bus only accept cashless mode.',
-                      style: Theme.of(context).textTheme.body2.merge(TextStyle(color: Colors.white, fontWeight: FontWeight.w500))
+                      style: Theme.of(context).textTheme.bodyText2?.merge(TextStyle(color: Colors.white, fontWeight: FontWeight.w500))
                     ),
                     new SizedBox(height: 5),
                     Text(
                       '**Disclaimer: These directions are for planning purposes only. You may find that construction projects, traffic, weather, or other events may cause conditions to differ from the map results, and you should plan your route accordingly. You must obey all signs or notices regarding your route.',
-                      style: Theme.of(context).textTheme.body2.merge(TextStyle(color: Colors.white, fontWeight: FontWeight.w500))
+                      style: Theme.of(context).textTheme.bodyText2?.merge(TextStyle(color: Colors.white, fontWeight: FontWeight.w500))
                     ),
                   ]
                 )
