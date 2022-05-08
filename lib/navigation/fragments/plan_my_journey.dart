@@ -14,14 +14,14 @@ class PlanMyJourney extends StatefulWidget {
 class _PlanMyJourneyState extends State<PlanMyJourney> with FragmentUtils, AutomaticKeepAliveClientMixin<PlanMyJourney> {
 
   List<dynamic> data = [];
-  Map<String, String> from = {};
+  Map<String, dynamic?> from = {};
   final TextEditingController _fromController = TextEditingController();
-  Map<String, String> to = {};
+  Map<String, dynamic?> to = {};
   final TextEditingController _toController = TextEditingController();
   TimeOfDay selectedTime = TimeOfDay.now();
   String time = TimeOfDay.now().toString().replaceAll('TimeOfDay(', '').replaceAll(')', '');
-  String mode = '';
-  String type = '';
+  String mode = 'mix';
+  String type = 'fastest';
 
   _PlanMyJourneyState();
 
@@ -157,11 +157,11 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with FragmentUtils, Autom
   void _getListPlanner() async {
     try {
       Map<String, String> query = {
-        'flat': from['lat'] ?? '',
-        'flng': from['lng'] ?? '',
-        'tlat': to['lat'] ?? '',
-        'tlng': to['lng'] ?? '',
-        'time': time + ':00',
+        'flat': from['lat']?.toString() ?? '',
+        'flng': from['lng']?.toString() ?? '',
+        'tlat': to['lat']?.toString() ?? '',
+        'tlng': to['lng']?.toString() ?? '',
+        'departure_datetime': new DateTime.now().toString().substring(0,10) + ' ' + time + ':00',
         'mode': mode,
         'type': type,
       };
@@ -170,19 +170,19 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with FragmentUtils, Autom
       showloadingDialog(false, context);
       if (response.statusCode == 200) {
         final responseBody = json.decode(response.body);
-        if (responseBody['data'].length > 0) {
-          if (responseBody['data'][0]['a'].length > 0) {
-            setState(() { data = responseBody['data'][0]['a']; });
-            showModalBottomSheet<void>(
-              context: context,
-              builder: (BuildContext _) {
-                return _renderRouteOptions(responseBody['data'][0]['a']);
-              },
-              backgroundColor: Colors.white,
-              isScrollControlled: false
-            );
-            return;
-          }
+        final routes = Map.from(responseBody['data']!)['routes']!;
+        if (routes.length > 0) {
+          setState(() { data = routes; });
+          print(data);
+          //showModalBottomSheet<void>(
+            //context: context,
+            //builder: (BuildContext _) {
+              //return _renderRouteOptions(responseBody['data'][0]['a']);
+            //},
+            //backgroundColor: Colors.white,
+            //isScrollControlled: false
+          //);
+          return;
         }
         final snackBar = SnackBar(content: Text('We are sorry, no results found for option chosen. Please try other modes'));
         ScaffoldMessenger.of(context).showSnackBar(snackBar);
@@ -280,27 +280,32 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with FragmentUtils, Autom
                     ),
                   ),
                   suggestionsCallback: (pattern) async {
+                    if (pattern.length == 0) {
+                      return Future<List>.value(List.empty());
+                    }
                     return await _getListStreetAutocomplete(pattern);
                   },
                   itemBuilder: (context, dynamic suggestion) {
                     return ListTile(
                       leading: Icon(Icons.my_location),
-                      title: Text(suggestion['label']!),
-                      subtitle: Text(suggestion['id']!),
+                      title: Text(suggestion['poiname'] ?? suggestion['areaname']!),
+                      subtitle: Text(suggestion['poi_id']?.toString() ?? suggestion['line_id']!.toString()),
                     );
                   },
                   onSuggestionSelected: (dynamic suggestion) {
-                    Map<String, String> tempFrom = {};
+                    Map<String, dynamic?> tempFrom = {};
                     suggestion.forEach((k, v) {
-                      tempFrom[k] = v;
-                      if (k == 'id') {
-                        final latlong = v.split('/');
-                        tempFrom['lat'] = latlong[0];
-                        tempFrom['lng'] = latlong[1];
+                      if (v == null || v.runtimeType == String) {
+                        tempFrom[k] = v;
+                      }
+                      if (k == 'geometry') {
+                        Map<String, dynamic> geo = Map.from(v!);
+                        tempFrom['lat'] = geo['coordinates'][1]!;
+                        tempFrom['lng'] = geo['coordinates'][0]!;
                       }
                     });
                     setState(() { from = tempFrom; });
-                    _fromController.text = from['label']!;
+                    _fromController.text = from['poiname'] ?? from['areaname']!;
                   },
                 ),
                 new SizedBox(height: 5.0),
@@ -333,27 +338,32 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with FragmentUtils, Autom
                     ),
                   ),
                   suggestionsCallback: (pattern) async {
+                    if (pattern.length == 0) {
+                      return Future<List>.value(List.empty());
+                    }
                     return await _getListStreetAutocomplete(pattern);
                   },
                   itemBuilder: (context, dynamic suggestion) {
                     return ListTile(
                       leading: Icon(Icons.my_location),
-                      title: Text(suggestion['label']!),
-                      subtitle: Text(suggestion['id']!),
+                      title: Text(suggestion['poiname'] ?? suggestion['areaname']!),
+                      subtitle: Text(suggestion['poi_id']?.toString() ?? suggestion['line_id']!.toString()),
                     );
                   },
                   onSuggestionSelected: (dynamic suggestion) {
-                    Map<String, String> tempTo = {};
+                    Map<String, dynamic?> tempTo = {};
                     suggestion.forEach((k, v) {
-                      tempTo[k] = v;
-                      if (k == 'id') {
-                        final latlong = v.split('/');
-                        tempTo['lat'] = latlong[0];
-                        tempTo['lng'] = latlong[1];
+                      if (v == null || v.runtimeType == String) {
+                        tempTo[k] = v;
+                      }
+                      if (k == 'geometry') {
+                        Map<String, dynamic> geo = Map.from(v!);
+                        tempTo['lat'] = geo['coordinates'][1]!;
+                        tempTo['lng'] = geo['coordinates'][0]!;
                       }
                     });
                     setState(() { to = tempTo; });
-                    _toController.text = to['label']!;
+                    _toController.text = to['poiname'] ?? to['areaname']!;
                   },
                 )
               ]
@@ -397,9 +407,9 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with FragmentUtils, Autom
                                 autofocus: true,
                                 activeColor: Colors.white,
                                 groupValue: type,
-                                value: '',
+                                value: 'fastest',
                                 onChanged: (String? value) {
-                                  setState(() { type = ''; });
+                                  setState(() { type = 'fastest'; });
                                 },
                               ),
                               new Row(
@@ -465,9 +475,9 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with FragmentUtils, Autom
                                 autofocus: true,
                                 activeColor: Colors.white,
                                 groupValue: mode,
-                                value: '',
+                                value: 'mix',
                                 onChanged: (String? value) {
-                                  setState(() { mode = ''; });
+                                  setState(() { mode = 'mix'; });
                                 },
                               ),
                               new Row(
