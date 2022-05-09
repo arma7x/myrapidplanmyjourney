@@ -163,12 +163,12 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with FragmentUtils, Autom
                       // ScaffoldMessenger.of(context).showSnackBar(snackBar);
                     },
                     onTap: () {
-                      //Navigator.push(
-                      //  context,
-                      //  MaterialPageRoute(builder: (BuildContext context) => new RouteDetail.fromJson(i))
-                      //);
-                      //print(i['legs'].runtimeType);
-                      print(_analyzeLegs(i['legs']));
+                      var data = _analyzeLegs(i['legs']);
+                      print(data);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (BuildContext context) => new RouteDetail(data['instructions'], data['cost']))
+                      );
                     },
                     child: new Container(
                       padding: EdgeInsets.fromLTRB(5.0, 10.0, 5.0, 10.0),

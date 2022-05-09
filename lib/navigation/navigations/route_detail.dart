@@ -1,76 +1,11 @@
 import 'package:flutter/material.dart';
 
 class RouteDetail extends StatefulWidget {
-  final String t_id;
-  final String t_no;
-  final String t_depart;
-  final String t_depart_hour;
-  final String t_depart_min;
-  final String t_depart_tt;
-  final String t_route;
-  final String t_distance;
-  final String t_duration;
-  final String t_duration_hour;
-  final String t_duration_min;
-  final String t_fare;
-  final Map<String, dynamic> t_fare_price;
-  final List<dynamic> t_transport;
-  final String t_steps;
-  final List<dynamic> t_detail;
-  final List<dynamic> t_geometry;
-  final List<dynamic> t_geometry_point;
-  final String t_stop_name;
-  final String t_leg;
-  final String t_arrival_time;
 
-  RouteDetail._(
-      {required this.t_id,
-      required this.t_no,
-      required this.t_depart,
-      required this.t_depart_hour,
-      required this.t_depart_min,
-      required this.t_depart_tt,
-      required this.t_route,
-      required this.t_distance,
-      required this.t_duration,
-      required this.t_duration_hour,
-      required this.t_duration_min,
-      required this.t_fare,
-      required this.t_fare_price,
-      required this.t_transport,
-      required this.t_steps,
-      required this.t_detail,
-      required this.t_geometry,
-      required this.t_geometry_point,
-      required this.t_stop_name,
-      required this.t_leg,
-      required this.t_arrival_time});
+  final List<dynamic> instructions;
+  final Map<String, dynamic> cost;
 
-  factory RouteDetail.fromJson(Map<String, dynamic> json) {
-    return new RouteDetail._(
-      t_id: json['t_id'],
-      t_no: json['t_no'],
-      t_depart: json['t_depart'],
-      t_depart_hour: json['t_depart_hour'],
-      t_depart_min: json['t_depart_min'],
-      t_depart_tt: json['t_depart_tt'],
-      t_route: json['t_route'],
-      t_distance: json['t_distance'],
-      t_duration: json['t_duration'],
-      t_duration_hour: json['t_duration_hour'],
-      t_duration_min: json['t_duration_min'],
-      t_fare: json['t_fare'],
-      t_fare_price: json['t_fare_price'],
-      t_transport: json['t_transport'],
-      t_steps: json['t_steps'],
-      t_detail: json['t_detail'],
-      t_geometry: json['t_geometry'],
-      t_geometry_point: json['t_geometry_point'],
-      t_stop_name: json['t_stop_name'],
-      t_leg: json['t_leg'],
-      t_arrival_time: json['t_arrival_time'],
-    );
-  }
+  RouteDetail(this.instructions, this.cost);
 
   @override
   _RouteDetailState createState() => _RouteDetailState();
@@ -103,22 +38,22 @@ class _RouteDetailState extends State<RouteDetail> {
       ),
       Theme.of(context).primaryColor
     ));
-    widget.t_fare_price.forEach((k, v) {
+    widget.cost.forEach((k, v) {
       Color bg_color = Theme.of(context).primaryColor;
       switch (k) {
-        case 'Cash':
+        case 'cash':
           bg_color = Colors.grey;
           break;
-        case 'Cashless':
+        case 'cashless':
           bg_color = Colors.red;
           break;
-        case 'Concession':
+        case 'concession':
           bg_color = Colors.purple;
           break;
-        case 'Monthly':
+        case 'monthly':
           bg_color = Colors.green;
           break;
-        case 'Weekly':
+        case 'weekly':
           bg_color = Colors.teal;
           break;
       }
@@ -128,7 +63,7 @@ class _RouteDetailState extends State<RouteDetail> {
           style: Theme.of(context).textTheme.bodyText2?.merge(TextStyle(color: Colors.white, fontWeight: FontWeight.w500))
         ),
         Text(
-          v.toUpperCase(),
+          "RM" + v.toStringAsFixed(2),
           style: Theme.of(context).textTheme.bodyText2?.merge(TextStyle(color: Colors.white, fontWeight: FontWeight.w500))
         ),
         bg_color
@@ -150,37 +85,29 @@ class _RouteDetailState extends State<RouteDetail> {
       )
     ));
     details.add(new SizedBox(height: 10));
-    for (var i in widget.t_detail) {
-      details.add(new Row(
+    for (var i in widget.instructions) {
+      details.add(new Column(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
           new Container(
-            width: (MediaQuery.of(context).size.width - 20) * 0.20,
+            width: double.infinity,
             child: new Text(
-              i['time'],
+              i['text'],
               style: Theme.of(context).textTheme.bodyText2?.merge(TextStyle(color: Colors.white, fontWeight: FontWeight.w500))
             ),
           ),
-          i['time'].contains(':') 
-          ? new Icon(Icons.lens, color: Colors.white, size: 22)
-          : new Container(
-            width: (MediaQuery.of(context).size.width - 20) * 0.02,
-            height: (MediaQuery.of(context).size.width - 20) * 0.25,
-            decoration: new BoxDecoration(
-              color: Colors.white,
-              borderRadius: new BorderRadius.only(
-                topLeft: const Radius.circular(3.0),
-                topRight: const Radius.circular(3.0),
-                bottomLeft: const Radius.circular(3.0),
-                bottomRight: const Radius.circular(3.0),
-              )
+          new Container(
+            width: double.infinity,
+            child: new Text(
+              i['distance'],
+              style: Theme.of(context).textTheme.bodyText2?.merge(TextStyle(color: Colors.white, fontWeight: FontWeight.w500))
             )
           ),
           new Container(
-            width: (MediaQuery.of(context).size.width - 20) * 0.70,
+            width: double.infinity,
             child: new Text(
-              i['place'],
+              i['duration'],
               style: Theme.of(context).textTheme.bodyText2?.merge(TextStyle(color: Colors.white, fontWeight: FontWeight.w500))
             )
           ),
@@ -202,7 +129,7 @@ class _RouteDetailState extends State<RouteDetail> {
 
     return Scaffold(
         appBar: AppBar(
-          title: Text(widget.t_route),
+          title: Text("Route"),
           elevation: 0.0,
         ),
         body: new Container(
@@ -210,33 +137,6 @@ class _RouteDetailState extends State<RouteDetail> {
             children: <Widget>[
               ..._renderFarePrices(),
               _renderDetail(),
-              new Container(
-                color: Theme.of(context).primaryColor,
-                padding: EdgeInsets.fromLTRB(10.0, 10, 10.0, 10),
-                child: new Column(
-                  children: <Widget>[
-                    Text(
-                      '**Interchange Station : Passengers are NOT REQUIRED to exit station and may proceed to interchange station.',
-                      style: Theme.of(context).textTheme.bodyText2?.merge(TextStyle(color: Colors.white, fontWeight: FontWeight.w500))
-                    ),
-                    new SizedBox(height: 5),
-                    Text(
-                      '**Connecting Station : Passengers are REQUIRED to exit and purchase new token at the connecting station.',
-                      style: Theme.of(context).textTheme.bodyText2?.merge(TextStyle(color: Colors.white, fontWeight: FontWeight.w500))
-                    ),
-                    new SizedBox(height: 5),
-                    Text(
-                      '**Rapid KL Bus and MRT Feeder Bus only accept cashless mode.',
-                      style: Theme.of(context).textTheme.bodyText2?.merge(TextStyle(color: Colors.white, fontWeight: FontWeight.w500))
-                    ),
-                    new SizedBox(height: 5),
-                    Text(
-                      '**Disclaimer: These directions are for planning purposes only. You may find that construction projects, traffic, weather, or other events may cause conditions to differ from the map results, and you should plan your route accordingly. You must obey all signs or notices regarding your route.',
-                      style: Theme.of(context).textTheme.bodyText2?.merge(TextStyle(color: Colors.white, fontWeight: FontWeight.w500))
-                    ),
-                  ]
-                )
-              ),
             ]
           )
         )
