@@ -63,6 +63,48 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with FragmentUtils, Autom
     return DateFormat('hh:mm a').format(eta).toString();
   }
 
+  Map<String, dynamic> _analyzeLegs(List<dynamic> legs) {
+    List<dynamic> instructions = <dynamic>[];
+    Map<String, dynamic> cost = new Map();
+    legs.forEach((_leg) {
+      var leg = Map.from(_leg);
+      if (leg['type'] != "pedestrain" && leg['alt_fare_price'] != null) {
+        Map.from(leg['alt_fare_price']).forEach((key, value) {
+          if (cost[key] == null) {
+            cost[key] = double.parse(value);
+          } else {
+            cost[key] += double.parse(value);
+          }
+        });
+      }
+      if (leg['type'] == "pedestrain") {
+        var temp = new Map();
+        temp['text'] = "Walk for about ${_humanReadableDuration(leg['duration'])} or ${(leg['distance']/1000).toStringAsFixed(2)}KM";
+        temp['distance'] = (leg['distance']/1000).toStringAsFixed(2) + "KM";
+        temp['duration'] = _humanReadableDuration(leg['duration']);
+        instructions.add(temp);
+      } else {
+        var transport = "LRT";
+        if (leg['other_route'].contains(new RegExp(r'[0-9]'))) {
+          transport = "Bus";
+        } else if (leg['other_route'][0].toLowerCase() == "mrt") {
+          transport = "MRT";
+        }
+        var temp = new Map();
+        var stop = Map.from(leg['steps'][leg['steps'].length - 1]);
+        temp['text'] =  "Take ${transport} ${leg['other_route'][0]} for about ${_humanReadableDuration(leg['duration'])} and stop at ${stop['stop_name']} station";
+        temp['distance'] = (leg['distance']/1000).toStringAsFixed(2) + "KM";
+        temp['duration'] = _humanReadableDuration(leg['duration']);
+        temp['stops'] =  leg['steps'].length;
+        instructions.add(temp);
+      }
+    });
+    return <String, dynamic>{
+      'instructions': instructions,
+      'cost': cost,
+    };
+  }
+
   Widget _renderRouteOptions(List<dynamic> options) {
     int idx = 0;
     List<Widget> routes = [];
@@ -125,6 +167,8 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with FragmentUtils, Autom
                       //  context,
                       //  MaterialPageRoute(builder: (BuildContext context) => new RouteDetail.fromJson(i))
                       //);
+                      //print(i['legs'].runtimeType);
+                      print(_analyzeLegs(i['legs']));
                     },
                     child: new Container(
                       padding: EdgeInsets.fromLTRB(5.0, 10.0, 5.0, 10.0),
