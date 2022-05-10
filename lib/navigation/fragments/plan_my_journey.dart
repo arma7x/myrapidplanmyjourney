@@ -85,10 +85,12 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with FragmentUtils, Autom
         instructions.add(temp);
       } else {
         var transport = "LRT";
-        if (leg['other_route'].contains(new RegExp(r'[0-9]'))) {
+        if (leg['other_route'][0].contains(new RegExp(r'[0-9]'))) {
           transport = "Bus";
         } else if (leg['other_route'][0].toLowerCase() == "mrt") {
           transport = "MRT";
+        } else if (leg['other_route'][0].toLowerCase() == "mrl") {
+          transport = "Monorail";
         }
         var temp = new Map();
         var stop = Map.from(leg['steps'][leg['steps'].length - 1]);
@@ -164,7 +166,6 @@ class _PlanMyJourneyState extends State<PlanMyJourney> with FragmentUtils, Autom
                     },
                     onTap: () {
                       var data = _analyzeLegs(i['legs']);
-                      print(data);
                       Navigator.push(
                         context,
                         MaterialPageRoute(builder: (BuildContext context) => new RouteDetail(data['instructions'], data['cost']))

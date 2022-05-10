@@ -94,25 +94,71 @@ class _RouteDetailState extends State<RouteDetail> {
             width: double.infinity,
             child: new Text(
               i['text'],
-              style: Theme.of(context).textTheme.bodyText2?.merge(TextStyle(color: Colors.white, fontWeight: FontWeight.w500))
+              style: Theme.of(context).textTheme.bodyText2?.merge(TextStyle(color: Colors.white, fontWeight: FontWeight.w500, fontSize: 16.0))
             ),
           ),
-          new Container(
-            width: double.infinity,
-            child: new Text(
-              i['distance'],
-              style: Theme.of(context).textTheme.bodyText2?.merge(TextStyle(color: Colors.white, fontWeight: FontWeight.w500))
-            )
-          ),
-          new Container(
-            width: double.infinity,
-            child: new Text(
-              i['duration'],
-              style: Theme.of(context).textTheme.bodyText2?.merge(TextStyle(color: Colors.white, fontWeight: FontWeight.w500))
-            )
+          new Row(
+            children: <Widget>[
+              new Container(
+                width: (MediaQuery.of(context).size.width - 20) * 0.33,
+                child: new Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    new SizedBox(height: 2),
+                    new Text(
+                      "Distance: ",
+                      style: Theme.of(context).textTheme.bodyText2?.merge(TextStyle(color: Colors.white, fontWeight: FontWeight.w500, fontSize: 14.0))
+                    ),
+                    new Text(
+                      i['distance'],
+                      style: Theme.of(context).textTheme.bodyText2?.merge(TextStyle(color: Colors.white, fontWeight: FontWeight.w500))
+                    )
+                  ]
+                )
+              ),
+              new Container(
+                width: (MediaQuery.of(context).size.width - 20) * 0.34,
+                child: new Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    new SizedBox(height: 2),
+                    new Text(
+                      "Duration: ",
+                      style: Theme.of(context).textTheme.bodyText2?.merge(TextStyle(color: Colors.white, fontWeight: FontWeight.w500, fontSize: 14.0))
+                    ),
+                    new Text(
+                      i['duration'],
+                      style: Theme.of(context).textTheme.bodyText2?.merge(TextStyle(color: Colors.white, fontWeight: FontWeight.w500))
+                    )
+                  ]
+                )
+              ),
+              i['stops'] != null
+              ? new Container(
+                width: (MediaQuery.of(context).size.width - 20) * 0.33,
+                child: new Row(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: <Widget>[
+                    new SizedBox(height: 2),
+                    new Text(
+                      "Stops: ",
+                      style: Theme.of(context).textTheme.bodyText2?.merge(TextStyle(color: Colors.white, fontWeight: FontWeight.w500, fontSize: 14.0))
+                    ),
+                    new Text(
+                      i['stops'].toString(),
+                      style: Theme.of(context).textTheme.bodyText2?.merge(TextStyle(color: Colors.white, fontWeight: FontWeight.w500))
+                    )
+                  ]
+                )
+              ) : new SizedBox(height: 0, width: 0),
+            ]
           ),
         ]
       ));
+      details.add(new SizedBox(height: 10));
     }
     return new Container(
       color: Colors.red,
